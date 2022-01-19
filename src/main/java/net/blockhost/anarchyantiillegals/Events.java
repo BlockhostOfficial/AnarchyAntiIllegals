@@ -17,7 +17,10 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -25,12 +28,15 @@ import org.bukkit.inventory.ItemStack;
 
 public class Events implements Listener {
     private final AntiIllegals plugin;
-    public Events(AntiIllegals plugin) {
-this.plugin = plugin;
 
+    public Events(AntiIllegals plugin) {
+        this.plugin = plugin;
     }
+
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
+        if (!Config.eventBlockBreak) return;
+
         if (!(event.getBlock().getState() instanceof InventoryHolder)) return;
 
         // inventory of the block
@@ -42,6 +48,8 @@ this.plugin = plugin;
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlaceBlock(BlockPlaceEvent event) {
+        if (!Config.eventBlockPlace) return;
+
         if (Config.REMOVE_ILLEGALS) {
             // placed block - stop placing if it's an illegal
             if (Checks.isIllegalBlock(event.getBlockPlaced().getType())) {
@@ -55,6 +63,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDestroy(VehicleDestroyEvent event) {
+        if (!Config.eventVehicleDestroy) return;
+
         if (event.getVehicle() instanceof InventoryHolder) {
             // inventory of the vehicle
             Inventory inventory = ((InventoryHolder) event.getVehicle()).getInventory();
@@ -66,6 +76,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerItemDrop(PlayerDropItemEvent event) {
+        if (!Config.eventPlayerItemDrop) return;
+
         if (event.getItemDrop() == null || event.getItemDrop().getItemStack() == null)
             return;
 
@@ -74,6 +86,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     private void onEntityPickupItem(EntityPickupItemEvent event) {
+        if (!Config.eventEntityPickupItem) return;
+
         if (event.getItem() == null || event.getItem().getItemStack() == null)
             return;
 
@@ -90,6 +104,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
+        if (!Config.eventEntityDeath) return;
+
         if (event.getDrops() == null || event.getDrops().isEmpty()) return;
 
         for (ItemStack drop : event.getDrops()) {
@@ -99,6 +115,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+        if (!Config.eventPlayerSwapHandItems) return;
+
         if (event.getMainHandItem() == null)
             if (plugin.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
                 event.setCancelled(true);
@@ -110,6 +128,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+        if (!Config.eventPlayerItemHeld) return;
+
         if (event.getPlayer().getInventory() == null)
             return;
 
@@ -124,6 +144,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
+        if (!Config.eventInventoryMoveItem) return;
+
         if (event.getItem() == null) return;
 
         if (plugin.checkItemStack(event.getItem(), event.getSource().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
@@ -133,6 +155,8 @@ this.plugin = plugin;
     @SuppressWarnings("IsCancelled")
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (!Config.eventPlayerInteractEntity) return;
+
         if (event.getRightClicked() == null) return;
 
         // Item Frame check only
@@ -159,6 +183,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     public void onHangingBreak(HangingBreakEvent event) {
+        if (!Config.eventHangingBreak) return;
+
         if (event.getEntity() == null) return;
         if (!(event.getEntity() instanceof ItemFrame)) return;
 
@@ -166,13 +192,15 @@ this.plugin = plugin;
 
         if (plugin.checkItemStack(item, event.getEntity().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL) {
             event.setCancelled(true);
-          ((ItemFrame) event.getEntity()).setItem(new ItemStack(Material.AIR));
+            ((ItemFrame) event.getEntity()).setItem(new ItemStack(Material.AIR));
             plugin.log(event.getEventName(), "Deleted Illegal from " + event.getEntity().getName());
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (!Config.eventEntityDamageByEntity) return;
+
         // only if an item frame get hit
         if (!(event.getEntity() instanceof ItemFrame)) return;
 
@@ -186,6 +214,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
+        if (!Config.eventInventoryClick) return;
+
         if (event.getClickedInventory() == null) return;
         if (!(event.getWhoClicked() instanceof Player)) return;
 
@@ -198,6 +228,8 @@ this.plugin = plugin;
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
+        if (!Config.eventInventoryOpen) return;
+
         if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
         plugin.checkInventory(event.getInventory(), event.getPlayer().getLocation(), true);
@@ -208,6 +240,8 @@ this.plugin = plugin;
     // This event does not get canceled on purpose because the item handling on event cancel is so wonky!
     @EventHandler(ignoreCancelled = true)
     public void onBlockDispense(BlockDispenseEvent event) {
+        if (!Config.eventBlockDispense) return;
+
         if (plugin.checkItemStack(event.getItem(), event.getBlock().getLocation(), false) == AntiIllegals.ItemState.ILLEGAL) {
             event.setCancelled(true);
             event.setItem(new ItemStack(Material.AIR));

@@ -9,3 +9,19 @@ checkShulkers: true
 fixUnbreakable: false
 revertFurnace: false
 maxBooksInShulker: true
+
+eventBlockBreak: true
+eventBlockPlace: true
+eventVehicleDestroy: true
+eventPlayerItemDrop: true
+eventEntityPickupItem: true
+eventEntityDeath: true
+eventPlayerSwapHandItems: true
+eventPlayerItemHeld: true
+eventInventoryMoveItem: true
+eventPlayerInteractEntity: true
+eventHangingBreak: true
+eventEntityDamageByEntity: true
+eventInventoryClick: true
+eventInventoryOpen: true
+eventBlockDispense: true
