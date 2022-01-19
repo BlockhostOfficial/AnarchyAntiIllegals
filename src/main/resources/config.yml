@@ -1,0 +1,11 @@
+removeIllegals: true
+removeBooks: true
+nameColorCheck: false
+removeLore: false
+removeOverstacked: false
+revertEnchantmentsMax: false
+revertEnchantmentsConflicting: false
+checkShulkers: true
+fixUnbreakable: false
+revertFurnace: false
+maxBooksInShulker: true

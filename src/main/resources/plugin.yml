@@ -1,4 +1,4 @@
 name: ${project.name}
 version: ${project.version}
-authors: [bierdosenhalter]
-main: org.zeroBzeroT.antiillegals.AntiIllegals
+authors: [bierdosenhalter, blockhost]
+main: net.blockhost.anarchyantiillegals.AntiIllegals

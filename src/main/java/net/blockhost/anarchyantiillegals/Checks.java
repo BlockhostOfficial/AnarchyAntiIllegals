@@ -1,9 +1,9 @@
-package org.zeroBzeroT.antiillegals;
+package net.blockhost.anarchyantiillegals;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import static org.zeroBzeroT.antiillegals.MaterialSets.*;
+import static net.blockhost.anarchyantiillegals.MaterialSets.*;
 
 public class Checks {
     public static boolean isIllegalBlock(final Material material) {

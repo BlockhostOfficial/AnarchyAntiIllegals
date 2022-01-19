@@ -5,8 +5,8 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.zeroBzeroT</groupId>
-    <artifactId>0b0t_AntiIllegals</artifactId>
+    <groupId>net.blockhost</groupId>
+    <artifactId>AnarchyAntiIllegals</artifactId>
     <version>1.0.33</version>
     <packaging>jar</packaging>
 

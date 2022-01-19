@@ -1,4 +1,4 @@
-package org.zeroBzeroT.antiillegals;
+package net.blockhost.anarchyantiillegals;
 
 import org.bukkit.Material;
 
