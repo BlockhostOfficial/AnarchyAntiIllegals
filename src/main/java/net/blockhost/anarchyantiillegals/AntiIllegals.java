@@ -99,7 +99,8 @@ public class AntiIllegals extends JavaPlugin {
 
         // Log
         if (wasFixed || fixedIllegals > 0 || fixedBooks > 0) {
-            log("checkInventory", "Illegal Blocks: " + fixedIllegals + " - Dropped Books: " + fixedBooks + " - Wrong Enchants: " + wasFixed);
+            String message = String.format("Illegal Blocks: %s - %s Books: %s - Wrong Enchants: %s", fixedIllegals, Config.DROP_BOOKS ? "Dropped": "Deleted", fixedBooks, wasFixed);
+            log("checkInventory", message);
         }
     }
 
