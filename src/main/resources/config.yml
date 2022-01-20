@@ -9,6 +9,8 @@ checkShulkers: true
 fixUnbreakable: false
 revertFurnace: false
 maxBooksInShulker: true
+maxBooks: 5
+dropBooks: false
 
 eventBlockBreak: true
 eventBlockPlace: true

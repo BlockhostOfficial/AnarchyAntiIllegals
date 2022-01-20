@@ -35,8 +35,8 @@ public class AntiIllegals extends JavaPlugin {
         List<ItemStack> bookItemStacks = new ArrayList<>();
 
         boolean wasFixed = false;
-        int fixesIllegals = 0;
-        int fixesBooks = 0;
+        int fixedIllegals = 0;
+        int fixedBooks = 0;
 
         // Loop through Inventory
         for (ItemStack itemStack : inventory.getContents()) {
@@ -66,40 +66,40 @@ public class AntiIllegals extends JavaPlugin {
             for (ItemStack itemStack : removeItemStacks) {
                 itemStack.setAmount(0);
                 inventory.remove(itemStack);
-                fixesIllegals++;
+                fixedIllegals++;
             }
         }
 
         if (Config.REMOVE_BOOKS) {
             // Remove books
-            if (bookItemStacks.size() > 5) {
-                //Location loc = player == null ? null : player.getLocation();
+            if (bookItemStacks.size() > Config.MAX_BOOKS) {
+                for (ItemStack itemStack : bookItemStacks) {
+                    inventory.remove(itemStack);
+                    fixedBooks++;
 
-                if (location != null) {
-                    for (ItemStack itemStack : bookItemStacks) {
-                        inventory.remove(itemStack);
-                        fixesBooks++;
-
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    location.getWorld().dropItem(location, itemStack).setPickupDelay(20 * 5);
-                                } catch (NullPointerException exception) {
-                                    cancel();
+                    if (Config.DROP_BOOKS) {
+                        if (location != null) {
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        location.getWorld().dropItem(location, itemStack).setPickupDelay(20 * 5);
+                                    } catch (NullPointerException exception) {
+                                        cancel();
+                                    }
                                 }
-                            }
-                        }.runTaskLater(this, 0);
+                            }.runTaskLater(this, 0);
+                        } else {
+                            log("checkInventory", "Found too many books in shulker but could not find location to drop them.");
+                        }
                     }
-                } else {
-                    log("checkInventory", "Found too many books in shulker but could not find location to drop them.");
                 }
             }
         }
 
         // Log
-        if (wasFixed || fixesIllegals > 0 || fixesBooks > 0) {
-            log("checkInventory", "Illegal Blocks: " + fixesIllegals + " - Dropped Books: " + fixesBooks + " - Wrong Enchants: " + wasFixed + ".");
+        if (wasFixed || fixedIllegals > 0 || fixedBooks > 0) {
+            log("checkInventory", "Illegal Blocks: " + fixedIllegals + " - Dropped Books: " + fixedBooks + " - Wrong Enchants: " + wasFixed);
         }
     }
 

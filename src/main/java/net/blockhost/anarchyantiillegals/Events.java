@@ -35,7 +35,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if (!Config.eventBlockBreak) return;
+        if (!Config.EVENT_BLOCK_BREAK) return;
 
         if (!(event.getBlock().getState() instanceof InventoryHolder)) return;
 
@@ -48,7 +48,7 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlaceBlock(BlockPlaceEvent event) {
-        if (!Config.eventBlockPlace) return;
+        if (!Config.EVENT_BLOCK_PLACE) return;
 
         if (Config.REMOVE_ILLEGALS) {
             // placed block - stop placing if it's an illegal
@@ -63,7 +63,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDestroy(VehicleDestroyEvent event) {
-        if (!Config.eventVehicleDestroy) return;
+        if (!Config.EVENT_VEHICLE_DESTROY) return;
 
         if (event.getVehicle() instanceof InventoryHolder) {
             // inventory of the vehicle
@@ -76,7 +76,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerItemDrop(PlayerDropItemEvent event) {
-        if (!Config.eventPlayerItemDrop) return;
+        if (!Config.EVENT_PLAYER_ITEM_DROP) return;
 
         if (event.getItemDrop() == null || event.getItemDrop().getItemStack() == null)
             return;
@@ -86,7 +86,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     private void onEntityPickupItem(EntityPickupItemEvent event) {
-        if (!Config.eventEntityPickupItem) return;
+        if (!Config.EVENT_ENTITY_PICKUP_ITEM) return;
 
         if (event.getItem() == null || event.getItem().getItemStack() == null)
             return;
@@ -104,7 +104,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
-        if (!Config.eventEntityDeath) return;
+        if (!Config.EVENT_ENTITY_DEATH) return;
 
         if (event.getDrops() == null || event.getDrops().isEmpty()) return;
 
@@ -115,7 +115,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
-        if (!Config.eventPlayerSwapHandItems) return;
+        if (!Config.EVENT_PLAYER_SWAP_HAND_ITEMS) return;
 
         if (event.getMainHandItem() == null)
             if (plugin.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
@@ -128,7 +128,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
-        if (!Config.eventPlayerItemHeld) return;
+        if (!Config.EVENT_PLAYER_ITEM_HELD) return;
 
         if (event.getPlayer().getInventory() == null)
             return;
@@ -144,7 +144,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
-        if (!Config.eventInventoryMoveItem) return;
+        if (!Config.EVENT_INVENTORY_MOVE_ITEM) return;
 
         if (event.getItem() == null) return;
 
@@ -155,7 +155,7 @@ public class Events implements Listener {
     @SuppressWarnings("IsCancelled")
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        if (!Config.eventPlayerInteractEntity) return;
+        if (!Config.EVENT_PLAYER_INTERACT_ENTITY) return;
 
         if (event.getRightClicked() == null) return;
 
@@ -183,7 +183,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onHangingBreak(HangingBreakEvent event) {
-        if (!Config.eventHangingBreak) return;
+        if (!Config.EVENT_HANGING_BREAK) return;
 
         if (event.getEntity() == null) return;
         if (!(event.getEntity() instanceof ItemFrame)) return;
@@ -199,7 +199,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (!Config.eventEntityDamageByEntity) return;
+        if (!Config.EVENT_ENTITY_DAMAGE_BY_ENTITY) return;
 
         // only if an item frame get hit
         if (!(event.getEntity() instanceof ItemFrame)) return;
@@ -214,7 +214,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!Config.eventInventoryClick) return;
+        if (!Config.EVENT_INVENTORY_CLICK) return;
 
         if (event.getClickedInventory() == null) return;
         if (!(event.getWhoClicked() instanceof Player)) return;
@@ -228,7 +228,7 @@ public class Events implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
-        if (!Config.eventInventoryOpen) return;
+        if (!Config.EVENT_INVENTORY_OPEN) return;
 
         if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
@@ -240,7 +240,7 @@ public class Events implements Listener {
     // This event does not get canceled on purpose because the item handling on event cancel is so wonky!
     @EventHandler(ignoreCancelled = true)
     public void onBlockDispense(BlockDispenseEvent event) {
-        if (!Config.eventBlockDispense) return;
+        if (!Config.EVENT_BLOCK_DISPENSE) return;
 
         if (plugin.checkItemStack(event.getItem(), event.getBlock().getLocation(), false) == AntiIllegals.ItemState.ILLEGAL) {
             event.setCancelled(true);
