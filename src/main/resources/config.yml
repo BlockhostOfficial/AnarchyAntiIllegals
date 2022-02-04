@@ -1,4 +1,3 @@
-removeIllegals: true
 removeBooks: true
 nameColorCheck: false
 removeLore: false
@@ -11,6 +10,25 @@ revertFurnace: false
 maxBooksInShulker: true
 maxBooks: 5
 dropBooks: false
+
+removeIllegals: true
+illegalBlocks:
+  - BEDROCK
+  - ENDER_PORTAL_FRAME
+  - BARRIER
+  - STRUCTURE_BLOCK
+  - STRUCTURE_VOID
+  - MOB_SPAWNER
+  - MONSTER_EGG
+  - COMMAND
+  - COMMAND_CHAIN
+  - COMMAND_MINECART
+  - COMMAND_REPEATING
+
+# Additional to the illegals fix. Only allows x items of a type in a shulker.
+limitInShulkers: false
+limitedInShulkers:
+  BEDROCK: 64 # Maximum amount of an item in shulkers
 
 eventBlockBreak: true
 eventBlockPlace: true

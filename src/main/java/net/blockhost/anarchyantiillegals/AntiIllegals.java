@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -12,9 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class AntiIllegals extends JavaPlugin {
     private static final int maxLoreEnchantmentLevel = 1;
@@ -33,10 +32,12 @@ public class AntiIllegals extends JavaPlugin {
     public void checkInventory(Inventory inventory, Location location, boolean checkRecursive, boolean isInsideShulker) {
         List<ItemStack> removeItemStacks = new ArrayList<>();
         List<ItemStack> bookItemStacks = new ArrayList<>();
+        Map<Material, List<ItemStack>> limitBlocksInShulker = new EnumMap<>(Material.class);
 
         boolean wasFixed = false;
         int fixedIllegals = 0;
         int fixedBooks = 0;
+        int limited = 0;
 
         // Loop through Inventory
         for (ItemStack itemStack : inventory.getContents()) {
@@ -53,6 +54,14 @@ public class AntiIllegals extends JavaPlugin {
                 case WRITTEN_BOOK:
                     if (isInsideShulker || inventory.getHolder() instanceof ShulkerBox) {
                         bookItemStacks.add(itemStack);
+                    }
+                    break;
+
+                case LIMITED_IN_SHULKERS:
+                    if (isInsideShulker || inventory.getHolder() instanceof ShulkerBox) {
+                        limitBlocksInShulker.putIfAbsent(itemStack.getType(), new ArrayList<>());
+
+                        limitBlocksInShulker.get(itemStack.getType()).add(itemStack);
                     }
                     break;
 
@@ -97,9 +106,32 @@ public class AntiIllegals extends JavaPlugin {
             }
         }
 
+        if (Config.LIMIT_IN_SHULKERS) {
+            limitBlocksInShulker.size();
+            for (Map.Entry<Material, List<ItemStack>> entry : limitBlocksInShulker.entrySet()) {
+                int max = MaterialSets.limitedInShulkers.get(entry.getKey());
+                int current = 0;
+
+                for (ItemStack stack : entry.getValue()) {
+                    if (current > max) {
+                        inventory.remove(stack);
+                        continue;
+                    }
+
+                    int newCurrent = current + stack.getAmount();
+
+                    if (newCurrent > max) {
+                        stack.setAmount(max - newCurrent);
+                    }
+
+                    current = newCurrent;
+                }
+            }
+        }
+
         // Log
         if (wasFixed || fixedIllegals > 0 || fixedBooks > 0) {
-            String message = String.format("Illegal Blocks: %s - %s Books: %s - Wrong Enchants: %s", fixedIllegals, Config.DROP_BOOKS ? "Dropped": "Deleted", fixedBooks, wasFixed);
+            String message = String.format("Illegal Blocks: %s - %s Books: %s - Wrong Enchants: %s Limited: %s", fixedIllegals, Config.DROP_BOOKS ? "Dropped": "Deleted", fixedBooks, wasFixed, limited);
             log("checkInventory", message);
         }
     }
@@ -261,6 +293,12 @@ public class AntiIllegals extends JavaPlugin {
                 return ItemState.WRITTEN_BOOK;
         }
 
+        if (Config.LIMIT_IN_SHULKERS) {
+            if (MaterialSets.limitedInShulkers.containsKey(itemStack.getType())) {
+                return ItemState.LIMITED_IN_SHULKERS;
+            }
+        }
+
         return wasFixed ? ItemState.WAS_FIXED : ItemState.CLEAN;
     }
 
@@ -273,12 +311,14 @@ public class AntiIllegals extends JavaPlugin {
      */
     public void onEnable() {
         saveDefaultConfig();
-        Config.load(getConfig());
+        FileConfiguration config = getConfig();
+        Config.load(config);
+        MaterialSets.load(config);
         getServer().getPluginManager().registerEvents(new Events(this), this);
         log("onEnable", "");
     }
 
     public enum ItemState {
-        EMPTY, CLEAN, WAS_FIXED, ILLEGAL, WRITTEN_BOOK
+        EMPTY, CLEAN, WAS_FIXED, ILLEGAL, WRITTEN_BOOK, LIMITED_IN_SHULKERS
     }
 }

@@ -16,6 +16,7 @@ public class Config {
     public static boolean MAX_BOOKS_IN_SHULKER;
     public static int MAX_BOOKS;
     public static boolean DROP_BOOKS;
+    public static boolean LIMIT_IN_SHULKERS;
     public static boolean EVENT_BLOCK_BREAK;
     public static boolean EVENT_BLOCK_PLACE;
     public static boolean EVENT_VEHICLE_DESTROY;
@@ -46,6 +47,8 @@ public class Config {
         MAX_BOOKS_IN_SHULKER = config.getBoolean("maxBooksInShulker");
         MAX_BOOKS = config.getInt("maxBooks");
         DROP_BOOKS = config.getBoolean("dropBooks");
+        LIMIT_IN_SHULKERS = config.getBoolean("limitInShulkers");
+
         EVENT_BLOCK_BREAK = config.getBoolean("eventBlockBreak");
         EVENT_BLOCK_PLACE = config.getBoolean("eventBlockPlace");
         EVENT_VEHICLE_DESTROY = config.getBoolean("eventVehicleDestroy");
