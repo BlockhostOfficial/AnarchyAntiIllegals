@@ -1,48 +1,15 @@
 package net.blockhost.anarchyantiillegals;
 
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.*;
 
 public class MaterialSets {
-    public static final Set<Material> armorMaterials = EnumSet.of(
-            Material.CHAINMAIL_HELMET,
-            Material.CHAINMAIL_CHESTPLATE,
-            Material.CHAINMAIL_LEGGINGS,
-            Material.CHAINMAIL_BOOTS,
+    public static final Set<Material> armorMaterials = EnumSet.noneOf(Material.class);
 
-            Material.IRON_HELMET,
-            Material.IRON_CHESTPLATE,
-            Material.IRON_LEGGINGS,
-            Material.IRON_BOOTS,
-
-            Material.GOLD_HELMET,
-            Material.GOLD_CHESTPLATE,
-            Material.GOLD_LEGGINGS,
-            Material.GOLD_BOOTS,
-
-            Material.DIAMOND_HELMET,
-            Material.DIAMOND_CHESTPLATE,
-            Material.DIAMOND_LEGGINGS,
-            Material.DIAMOND_BOOTS
-    );
-
-    public static final Set<Material> weaponMaterials = EnumSet.of(
-            Material.WOOD_AXE,
-            Material.STONE_AXE,
-            Material.IRON_AXE,
-            Material.GOLD_AXE,
-            Material.DIAMOND_AXE,
-
-            Material.WOOD_SWORD,
-            Material.STONE_SWORD,
-            Material.IRON_SWORD,
-            Material.GOLD_SWORD,
-            Material.DIAMOND_SWORD,
-
-            Material.BOW
-    );
+    public static final Set<Material> weaponMaterials = EnumSet.noneOf(Material.class);
 
     public static Set<Material> illegalBlocks = new HashSet<>();
 
@@ -50,19 +17,31 @@ public class MaterialSets {
 
     public static void load(FileConfiguration config) {
         illegalBlocks.clear();
-        config.getStringList("illegalBlocks").forEach(material -> {
-            Material materialObject = Material.getMaterial(material);
-            if (materialObject != null) {
-                illegalBlocks.add(materialObject);
-            }
-        });
+        config.getStringList("illegalBlocks").forEach(material ->
+                XMaterial.matchXMaterial(material).ifPresent(
+                        material1 -> illegalBlocks.add(material1.parseMaterial()))
+        );
 
         limitedInShulkers.clear();
-        config.getConfigurationSection("limitedInShulkers").getKeys(false).forEach(key -> {
-            Material materialObject = Material.getMaterial(key);
-            if (materialObject != null) {
-                limitedInShulkers.put(materialObject, config.getInt("limitedInShulkers." + key));
-            }
-        });
+        config.getConfigurationSection("limitedInShulkers").getKeys(false).forEach(key ->
+                XMaterial.matchXMaterial(key).ifPresent(
+                        material -> limitedInShulkers.put(
+                                material.parseMaterial(),
+                                config.getInt("limitedInShulkers." + key)))
+        );
+
+        armorMaterials.clear();
+        config.getStringList("armorMaterials").forEach(material ->
+                XMaterial.matchXMaterial(material).ifPresent(
+                        material1 -> armorMaterials.add(material1.parseMaterial())
+                )
+        );
+
+        weaponMaterials.clear();
+        config.getStringList("weaponMaterials").forEach(material ->
+                XMaterial.matchXMaterial(material).ifPresent(
+                        material1 -> weaponMaterials.add(material1.parseMaterial())
+                )
+        );
     }
 }

@@ -41,6 +41,14 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.cryptomorin.xseries</pattern>
+                                    <!-- Be sure to change the package below -->
+                                    <shadedPattern>net.blockhost.anarchyantiillegals.shade</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <minimizeJar>true</minimizeJar>
                         </configuration>
                     </execution>
                 </executions>
@@ -67,6 +75,11 @@
             <artifactId>spigot-api</artifactId>
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cryptomorin</groupId>
+            <artifactId>XSeries</artifactId>
+            <version>8.6.1</version>
         </dependency>
     </dependencies>
 

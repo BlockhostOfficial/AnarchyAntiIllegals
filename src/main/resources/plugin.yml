@@ -2,3 +2,4 @@ name: ${project.name}
 version: ${project.version}
 authors: [bierdosenhalter, blockhost]
 main: net.blockhost.anarchyantiillegals.AntiIllegals
+api-version: 1.13

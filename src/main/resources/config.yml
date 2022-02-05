@@ -1,3 +1,6 @@
+# This plugin uses XMaterial to support 1.12.2 and 1.13+.
+# You can find all the materials here: https://github.com/CryptoMorin/XSeries/blob/master/src/main/java/com/cryptomorin/xseries/XMaterial.java
+
 removeBooks: true
 nameColorCheck: false
 removeLore: false
@@ -25,10 +28,10 @@ illegalBlocks:
   - COMMAND_MINECART
   - COMMAND_REPEATING
 
-# Additional to the illegals fix. Only allows x items of a type in a shulker.
+# Only allows x slots of a type in a shulker.
 limitInShulkers: false
 limitedInShulkers:
-  BEDROCK: 64 # Maximum amount of an item in shulkers
+  BEDROCK: 1 # Maximum amount of item slots in shulkers for this type
 
 eventBlockBreak: true
 eventBlockPlace: true
@@ -45,3 +48,34 @@ eventEntityDamageByEntity: true
 eventInventoryClick: true
 eventInventoryOpen: true
 eventBlockDispense: true
+
+armorMaterials:
+  - CHAINMAIL_HELMET
+  - CHAINMAIL_CHESTPLATE
+  - CHAINMAIL_LEGGINGS
+  - CHAINMAIL_BOOTS
+  - IRON_HELMET
+  - IRON_CHESTPLATE
+  - IRON_LEGGINGS
+  - IRON_BOOTS
+  - GOLD_HELMET
+  - GOLD_CHESTPLATE
+  - GOLD_LEGGINGS
+  - GOLD_BOOTS
+  - DIAMOND_HELMET
+  - DIAMOND_CHESTPLATE
+  - DIAMOND_LEGGINGS
+  - DIAMOND_BOOTS
+
+weaponMaterials:
+  - WOOD_AXE
+  - STONE_AXE
+  - IRON_AXE
+  - GOLD_AXE
+  - DIAMOND_AXE
+  - WOOD_SWORD
+  - STONE_SWORD
+  - IRON_SWORD
+  - GOLD_SWORD
+  - DIAMOND_SWORD
+  - BOW

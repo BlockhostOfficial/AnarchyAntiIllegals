@@ -1,5 +1,6 @@
 package net.blockhost.anarchyantiillegals;
 
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,15 +31,18 @@ public class AntiIllegals extends JavaPlugin {
      * @param checkRecursive true, if items inside containers should be checked
      */
     public void checkInventory(Inventory inventory, Location location, boolean checkRecursive, boolean isInsideShulker) {
+        isInsideShulker = isInsideShulker || inventory.getHolder() instanceof ShulkerBox;
+
         List<ItemStack> removeItemStacks = new ArrayList<>();
         List<ItemStack> bookItemStacks = new ArrayList<>();
-        Map<Material, List<ItemStack>> limitBlocksInShulker = new EnumMap<>(Material.class);
+        Map<Material, List<Integer>> limitBlocksInShulker = new EnumMap<>(Material.class);
 
         boolean wasFixed = false;
         int fixedIllegals = 0;
         int fixedBooks = 0;
         int limited = 0;
 
+        int index = 0;
         // Loop through Inventory
         for (ItemStack itemStack : inventory.getContents()) {
             switch (checkItemStack(itemStack, location, checkRecursive)) {
@@ -52,22 +56,23 @@ public class AntiIllegals extends JavaPlugin {
 
                 // Book inside a shulker
                 case WRITTEN_BOOK:
-                    if (isInsideShulker || inventory.getHolder() instanceof ShulkerBox) {
+                    if (isInsideShulker) {
                         bookItemStacks.add(itemStack);
                     }
                     break;
 
                 case LIMITED_IN_SHULKERS:
-                    if (isInsideShulker || inventory.getHolder() instanceof ShulkerBox) {
+                    if (isInsideShulker) {
                         limitBlocksInShulker.putIfAbsent(itemStack.getType(), new ArrayList<>());
 
-                        limitBlocksInShulker.get(itemStack.getType()).add(itemStack);
+                        limitBlocksInShulker.get(itemStack.getType()).add(index);
                     }
                     break;
 
                 default:
                     break;
             }
+            index++;
         }
 
         if (Config.REMOVE_ILLEGALS) {
@@ -107,30 +112,22 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         if (Config.LIMIT_IN_SHULKERS) {
-            limitBlocksInShulker.size();
-            for (Map.Entry<Material, List<ItemStack>> entry : limitBlocksInShulker.entrySet()) {
+            for (Map.Entry<Material, List<Integer>> entry : limitBlocksInShulker.entrySet()) {
                 int max = MaterialSets.limitedInShulkers.get(entry.getKey());
                 int current = 0;
 
-                for (ItemStack stack : entry.getValue()) {
+                for (Integer stack : entry.getValue()) {
+                    current++;
                     if (current > max) {
-                        inventory.remove(stack);
-                        continue;
+                        inventory.clear(stack);
+                        limited++;
                     }
-
-                    int newCurrent = current + stack.getAmount();
-
-                    if (newCurrent > max) {
-                        stack.setAmount(max - newCurrent);
-                    }
-
-                    current = newCurrent;
                 }
             }
         }
 
         // Log
-        if (wasFixed || fixedIllegals > 0 || fixedBooks > 0) {
+        if (wasFixed || fixedIllegals > 0 || fixedBooks > 0 || limited > 0) {
             String message = String.format("Illegal Blocks: %s - %s Books: %s - Wrong Enchants: %s Limited: %s", fixedIllegals, Config.DROP_BOOKS ? "Dropped": "Deleted", fixedBooks, wasFixed, limited);
             log("checkInventory", message);
         }
@@ -152,7 +149,7 @@ public class AntiIllegals extends JavaPlugin {
 
         if (Config.REMOVE_COLOR) {
             // Name Color Check
-            if (itemStack.getType() != Material.WRITTEN_BOOK) {
+            if (itemStack.getType() != XMaterial.WRITTEN_BOOK.parseMaterial()) {
                 if (itemStack.hasItemMeta()) {
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
@@ -182,7 +179,7 @@ public class AntiIllegals extends JavaPlugin {
 
         if (Config.REVERT_FURNACE) {
             // nbt furnace check
-            if (itemStack.getType() == Material.FURNACE && itemStack.toString().contains("internal=")) {
+            if (itemStack.getType() == XMaterial.FURNACE.parseMaterial() && itemStack.toString().contains("internal=")) {
                 // TODO: replace this hack with a solution that checks the nbt tag
                 itemStack.setAmount(0);
                 return ItemState.ILLEGAL;
@@ -289,7 +286,7 @@ public class AntiIllegals extends JavaPlugin {
 
         if (Config.MAX_BOOKS_IN_SHULKER) {
             // books
-            if (itemStack.getType() == Material.WRITTEN_BOOK || itemStack.getType() == Material.BOOK_AND_QUILL)
+            if (itemStack.getType() == XMaterial.WRITTEN_BOOK.parseMaterial() || itemStack.getType() == XMaterial.WRITABLE_BOOK.parseMaterial())
                 return ItemState.WRITTEN_BOOK;
         }
 
