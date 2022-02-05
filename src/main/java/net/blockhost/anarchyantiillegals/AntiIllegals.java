@@ -310,7 +310,7 @@ public class AntiIllegals extends JavaPlugin {
         saveDefaultConfig();
         FileConfiguration config = getConfig();
         Config.load(config);
-        MaterialSets.load(config);
+        MaterialSets.load(config, this);
         getServer().getPluginManager().registerEvents(new Events(this), this);
         log("onEnable", "");
     }
