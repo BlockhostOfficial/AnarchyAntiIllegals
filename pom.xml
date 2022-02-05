@@ -44,7 +44,6 @@
                             <relocations>
                                 <relocation>
                                     <pattern>com.cryptomorin.xseries</pattern>
-                                    <!-- Be sure to change the package below -->
                                     <shadedPattern>net.blockhost.anarchyantiillegals.shade</shadedPattern>
                                 </relocation>
                             </relocations>
