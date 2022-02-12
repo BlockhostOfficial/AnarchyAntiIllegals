@@ -25,6 +25,7 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public class Events implements Listener {
     private final AntiIllegals plugin;
@@ -52,9 +53,10 @@ public class Events implements Listener {
 
         if (Config.REMOVE_ILLEGALS) {
             // placed block - stop placing if it's an illegal
-            if (Checks.isIllegalBlock(event.getBlockPlaced().getType())) {
+            if (Checks.isIllegalBlock(event.getBlockPlaced().getType())
+                    && event.getBlockPlaced().getType() != event.getBlockReplacedState().getType()) {
                 event.setCancelled(true);
-                plugin.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced() + "");
+                plugin.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced());
             }
         }
 
@@ -117,11 +119,11 @@ public class Events implements Listener {
     public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
         if (!Config.EVENT_PLAYER_SWAP_HAND_ITEMS) return;
 
-        if (event.getMainHandItem() == null)
+        if (event.getMainHandItem() != null)
             if (plugin.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
                 event.setCancelled(true);
 
-        if (event.getOffHandItem() == null)
+        if (event.getOffHandItem() != null)
             if (plugin.checkItemStack(event.getOffHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
                 event.setCancelled(true);
     }
@@ -162,19 +164,18 @@ public class Events implements Listener {
         // Item Frame check only
         if (!(event.getRightClicked() instanceof ItemFrame)) return;
 
-        ItemStack mainHandStack = event.getPlayer().getInventory().getItemInMainHand();
+        Location loc = event.getPlayer().getLocation();
+        PlayerInventory inv = event.getPlayer().getInventory();
 
-        if (plugin.checkItemStack(mainHandStack, event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.ILLEGAL)
+        if (plugin.checkItemStack(inv.getItemInMainHand(), loc, false) == AntiIllegals.ItemState.ILLEGAL)
             event.setCancelled(true);
 
-        ItemStack offhandHandStack = event.getPlayer().getInventory().getItemInOffHand();
-
-        if (plugin.checkItemStack(offhandHandStack, event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.ILLEGAL)
+        if (plugin.checkItemStack(inv.getItemInOffHand(), loc, false) == AntiIllegals.ItemState.ILLEGAL)
             event.setCancelled(true);
 
         ItemStack frameStack = ((ItemFrame) event.getRightClicked()).getItem();
 
-        if (plugin.checkItemStack(frameStack, event.getPlayer().getLocation(), false) == AntiIllegals.ItemState.ILLEGAL)
+        if (plugin.checkItemStack(frameStack, loc, false) == AntiIllegals.ItemState.ILLEGAL)
             event.setCancelled(true);
 
         if (event.isCancelled())
@@ -208,7 +209,7 @@ public class Events implements Listener {
 
         if (plugin.checkItemStack(itemFrame.getItem(), event.getEntity().getLocation(), false) == AntiIllegals.ItemState.ILLEGAL) {
             itemFrame.setItem(new ItemStack(Material.AIR));
-            plugin.log(event.getEventName(), "Removed illegal item from " + itemFrame.toString());
+            plugin.log(event.getEventName(), "Removed illegal item from " + itemFrame);
         }
     }
 
@@ -217,6 +218,7 @@ public class Events implements Listener {
         if (!Config.EVENT_INVENTORY_CLICK) return;
 
         if (event.getClickedInventory() == null) return;
+
         if (!(event.getWhoClicked() instanceof Player)) return;
 
         if (plugin.checkItemStack(event.getCurrentItem(), event.getWhoClicked().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
