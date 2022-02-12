@@ -18,7 +18,7 @@ public class MaterialSets {
     private MaterialSets() {
     }
 
-    public static void load(FileConfiguration config, AntiIllegals plugin) {
+    public static void load(FileConfiguration config, AnarchyAntiIllegals plugin) {
         ILLEGAL_BLOCKS.clear();
         config.getStringList("illegalBlocks").forEach(material -> {
             Optional<XMaterial> xMaterial = XMaterial.matchXMaterial(material);

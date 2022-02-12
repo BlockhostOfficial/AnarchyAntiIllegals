@@ -1,5 +1,5 @@
-name: ${project.name}
+name: AnarchyAntiIllegals
 version: ${project.version}
 authors: [bierdosenhalter, blockhost]
-main: net.blockhost.anarchyantiillegals.AntiIllegals
+main: net.blockhost.anarchyantiillegals.AnarchyAntiIllegals
 api-version: 1.13

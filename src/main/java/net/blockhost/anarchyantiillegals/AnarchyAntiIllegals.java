@@ -16,7 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-public class AntiIllegals extends JavaPlugin {
+public class AnarchyAntiIllegals extends JavaPlugin {
     private static final int MAX_LORE_ENCHANTMENT_LEVEL = 1;
 
     public void checkInventory(Inventory inventory, Location location, boolean checkRecursive) {
