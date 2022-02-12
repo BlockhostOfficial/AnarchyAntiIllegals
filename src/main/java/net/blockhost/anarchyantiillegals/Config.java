@@ -17,6 +17,7 @@ public class Config {
     public static int MAX_BOOKS;
     public static boolean DROP_BOOKS;
     public static boolean LIMIT_IN_SHULKERS;
+    public static boolean FORCE_ASCII_DISPLAY_NAME;
     public static boolean EVENT_BLOCK_BREAK;
     public static boolean EVENT_BLOCK_PLACE;
     public static boolean EVENT_VEHICLE_DESTROY;
@@ -48,6 +49,7 @@ public class Config {
         MAX_BOOKS = config.getInt("maxBooks");
         DROP_BOOKS = config.getBoolean("dropBooks");
         LIMIT_IN_SHULKERS = config.getBoolean("limitInShulkers");
+        FORCE_ASCII_DISPLAY_NAME = config.getBoolean("forceAsciiDisplayName");
 
         EVENT_BLOCK_BREAK = config.getBoolean("eventBlockBreak");
         EVENT_BLOCK_PLACE = config.getBoolean("eventBlockPlace");

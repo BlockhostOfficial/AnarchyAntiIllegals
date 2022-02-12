@@ -33,6 +33,8 @@ limitInShulkers: false
 limitedInShulkers:
   BEDROCK: 1 # Maximum amount of item slots in shulkers for this type
 
+forceAsciiDisplayName: true
+
 eventBlockBreak: true
 eventBlockPlace: true
 eventVehicleDestroy: true

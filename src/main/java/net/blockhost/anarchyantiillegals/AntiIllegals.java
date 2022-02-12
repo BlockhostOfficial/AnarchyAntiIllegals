@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 
 public class AntiIllegals extends JavaPlugin {
-    private static final int maxLoreEnchantmentLevel = 1;
+    private static final int MAX_LORE_ENCHANTMENT_LEVEL = 1;
 
     public void checkInventory(Inventory inventory, Location location, boolean checkRecursive) {
         checkInventory(inventory, location, checkRecursive, false);
@@ -113,7 +113,7 @@ public class AntiIllegals extends JavaPlugin {
 
         if (Config.LIMIT_IN_SHULKERS) {
             for (Map.Entry<Material, List<Integer>> entry : limitBlocksInShulker.entrySet()) {
-                int max = MaterialSets.limitedInShulkers.get(entry.getKey());
+                int max = MaterialSets.LIMITED_IN_SHULKERS.get(entry.getKey());
                 int current = 0;
 
                 for (Integer stack : entry.getValue()) {
@@ -194,9 +194,21 @@ public class AntiIllegals extends JavaPlugin {
             }
         }
 
+        if (Config.FORCE_ASCII_DISPLAY_NAME) {
+            if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName()) {
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                String displayName = itemMeta.getDisplayName();
+
+                if (displayName.matches("[^\\p{ASCII}]")) {
+                    itemMeta.setDisplayName(displayName.replaceAll("[^\\p{ASCII}]", ""));
+                    itemStack.setItemMeta(itemMeta);
+                }
+            }
+        }
+
         if (Config.REMOVE_LORE) {
             // Check items with lore
-            if (itemStack.getItemMeta() != null && itemStack.getItemMeta().hasLore()) {
+            if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore()) {
                 // Christmas Illegals
             /*if (itemStack.getItemMeta().getLore().contains("Christmas Advent Calendar 2020"))
                 return ItemState.clean;*/
@@ -241,12 +253,12 @@ public class AntiIllegals extends JavaPlugin {
             // Max Enchantment
             for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
                 if (!enchantment.canEnchantItem(itemStack) && !Checks.isArmor(itemStack) && !Checks.isWeapon(itemStack)
-                        && itemStack.getEnchantmentLevel(enchantment) > maxLoreEnchantmentLevel) {
+                        && itemStack.getEnchantmentLevel(enchantment) > MAX_LORE_ENCHANTMENT_LEVEL) {
                     // enforce lore enchantments level
                     wasFixed = true;
 
                     itemStack.removeEnchantment(enchantment);
-                    itemStack.addUnsafeEnchantment(enchantment, maxLoreEnchantmentLevel);
+                    itemStack.addUnsafeEnchantment(enchantment, MAX_LORE_ENCHANTMENT_LEVEL);
                 } else if (itemStack.getEnchantmentLevel(enchantment) > enchantment.getMaxLevel()) {
                     // enforce max enchantment level
                     wasFixed = true;
@@ -291,7 +303,7 @@ public class AntiIllegals extends JavaPlugin {
         }
 
         if (Config.LIMIT_IN_SHULKERS) {
-            if (MaterialSets.limitedInShulkers.containsKey(itemStack.getType())) {
+            if (MaterialSets.LIMITED_IN_SHULKERS.containsKey(itemStack.getType())) {
                 return ItemState.LIMITED_IN_SHULKERS;
             }
         }
@@ -300,12 +312,13 @@ public class AntiIllegals extends JavaPlugin {
     }
 
     public void log(String module, String message) {
-        getLogger().info("§a[" + module + "] §e" + message + "§r");
+        getLogger().info(() -> String.format("§a[%s] §e%s§r", module, message));
     }
 
     /**
      * fired when the plugin gets enabled
      */
+    @Override
     public void onEnable() {
         saveDefaultConfig();
         FileConfiguration config = getConfig();

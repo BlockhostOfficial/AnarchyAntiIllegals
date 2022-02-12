@@ -6,12 +6,15 @@ import org.bukkit.inventory.ItemStack;
 import static net.blockhost.anarchyantiillegals.MaterialSets.*;
 
 public class Checks {
+    private Checks() {
+    }
+
     public static boolean isIllegalBlock(final Material material) {
         if (material == null) {
             return false;
         }
 
-        return illegalBlocks.contains(material);
+        return ILLEGAL_BLOCKS.contains(material);
     }
 
     public static boolean isArmor(final ItemStack itemStack) {
@@ -19,7 +22,7 @@ public class Checks {
             return false;
         }
 
-        return armorMaterials.contains(itemStack.getType());
+        return ARMOR_MATERIALS.contains(itemStack.getType());
     }
 
     public static boolean isWeapon(final ItemStack itemStack) {
@@ -27,6 +30,6 @@ public class Checks {
             return false;
         }
 
-        return weaponMaterials.contains(itemStack.getType());
+        return WEAPON_MATERIALS.contains(itemStack.getType());
     }
 }

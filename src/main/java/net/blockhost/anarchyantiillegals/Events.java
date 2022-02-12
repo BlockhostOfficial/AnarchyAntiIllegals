@@ -119,13 +119,13 @@ public class Events implements Listener {
     public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
         if (!Config.EVENT_PLAYER_SWAP_HAND_ITEMS) return;
 
-        if (event.getMainHandItem() != null)
-            if (plugin.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
-                event.setCancelled(true);
+        if (event.getMainHandItem() != null
+                && plugin.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
+            event.setCancelled(true);
 
-        if (event.getOffHandItem() != null)
-            if (plugin.checkItemStack(event.getOffHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
-                event.setCancelled(true);
+        if (event.getOffHandItem() != null
+                && plugin.checkItemStack(event.getOffHandItem(), event.getPlayer().getLocation(), true) == AntiIllegals.ItemState.ILLEGAL)
+            event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true)
