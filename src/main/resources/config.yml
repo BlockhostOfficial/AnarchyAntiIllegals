@@ -13,6 +13,7 @@ revertFurnace: false
 maxBooksInShulker: true
 maxBooks: 5
 dropBooks: false
+inventoryOpenIgnoreEnderChest: false # Only enable if the inventory open event causes lag
 
 removeIllegals: true
 illegalBlocks:
@@ -49,6 +50,7 @@ eventHangingBreak: true
 eventEntityDamageByEntity: true
 eventInventoryClick: true
 eventInventoryOpen: true
+eventPlayerJoin: true
 eventBlockDispense: true
 
 armorMaterials:

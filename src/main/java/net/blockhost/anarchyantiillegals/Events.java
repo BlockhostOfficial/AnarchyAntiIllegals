@@ -17,10 +17,7 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -232,9 +229,17 @@ public class Events implements Listener {
     public void onInventoryOpen(InventoryOpenEvent event) {
         if (!Config.EVENT_INVENTORY_OPEN) return;
 
-        if (event.getInventory().equals(event.getPlayer().getEnderChest())) return;
+        if (Config.INVENTORY_OPEN_IGNORE_ENDER_CHEST
+                && event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
         plugin.checkInventory(event.getInventory(), event.getPlayer().getLocation(), true);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryOpen(PlayerJoinEvent event) {
+        if (!Config.EVENT_PLAYER_JOIN) return;
+
+        plugin.checkInventory(event.getPlayer().getInventory(), event.getPlayer().getLocation(), true);
     }
 
     // from cloudanarchy core

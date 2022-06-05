@@ -18,6 +18,7 @@ public class Config {
     public static boolean DROP_BOOKS;
     public static boolean LIMIT_IN_SHULKERS;
     public static boolean FORCE_ASCII_DISPLAY_NAME;
+    public static boolean INVENTORY_OPEN_IGNORE_ENDER_CHEST;
     public static boolean EVENT_BLOCK_BREAK;
     public static boolean EVENT_BLOCK_PLACE;
     public static boolean EVENT_VEHICLE_DESTROY;
@@ -32,6 +33,7 @@ public class Config {
     public static boolean EVENT_ENTITY_DAMAGE_BY_ENTITY;
     public static boolean EVENT_INVENTORY_CLICK;
     public static boolean EVENT_INVENTORY_OPEN;
+    public static boolean EVENT_PLAYER_JOIN;
     public static boolean EVENT_BLOCK_DISPENSE;
 
     public static void load(FileConfiguration config) {
@@ -50,6 +52,7 @@ public class Config {
         DROP_BOOKS = config.getBoolean("dropBooks");
         LIMIT_IN_SHULKERS = config.getBoolean("limitInShulkers");
         FORCE_ASCII_DISPLAY_NAME = config.getBoolean("forceAsciiDisplayName");
+        INVENTORY_OPEN_IGNORE_ENDER_CHEST = config.getBoolean("inventoryOpenIgnoreEnderChest");
 
         EVENT_BLOCK_BREAK = config.getBoolean("eventBlockBreak");
         EVENT_BLOCK_PLACE = config.getBoolean("eventBlockPlace");
@@ -65,6 +68,7 @@ public class Config {
         EVENT_ENTITY_DAMAGE_BY_ENTITY = config.getBoolean("eventEntityDamageByEntity");
         EVENT_INVENTORY_CLICK = config.getBoolean("eventInventoryClick");
         EVENT_INVENTORY_OPEN = config.getBoolean("eventInventoryOpen");
+        EVENT_PLAYER_JOIN = config.getBoolean("eventPlayerJoin");
         EVENT_BLOCK_DISPENSE = config.getBoolean("eventBlockDispense");
     }
 }
