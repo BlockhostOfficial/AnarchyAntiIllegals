@@ -29,8 +29,9 @@ public class AnarchyAntiIllegals extends JavaPlugin {
      * @param inventory      the inventory that should be checked
      * @param location       location of the inventory holder for possible item drops
      * @param checkRecursive true, if items inside containers should be checked
+     * @return true, if the inventory was modified
      */
-    public void checkInventory(Inventory inventory, Location location, boolean checkRecursive, boolean isInsideShulker) {
+    public boolean checkInventory(Inventory inventory, Location location, boolean checkRecursive, boolean isInsideShulker) {
         isInsideShulker = isInsideShulker || inventory.getHolder() instanceof ShulkerBox;
 
         List<ItemStack> removeItemStacks = new ArrayList<>();
@@ -76,10 +77,9 @@ public class AnarchyAntiIllegals extends JavaPlugin {
         }
 
         if (Config.REMOVE_ILLEGALS) {
-            // Remove illegal items - TODO: check if that is needed if setAmount(0) is in place
+            // Remove illegal items
             for (ItemStack itemStack : removeItemStacks) {
                 itemStack.setAmount(0);
-                inventory.remove(itemStack);
                 fixedIllegals++;
             }
         }
@@ -88,7 +88,7 @@ public class AnarchyAntiIllegals extends JavaPlugin {
             // Remove books
             if (bookItemStacks.size() > Config.MAX_BOOKS) {
                 for (ItemStack itemStack : bookItemStacks) {
-                    inventory.remove(itemStack);
+                    itemStack.setAmount(0);
                     fixedBooks++;
 
                     if (Config.DROP_BOOKS) {
@@ -130,7 +130,8 @@ public class AnarchyAntiIllegals extends JavaPlugin {
         if (wasFixed || fixedIllegals > 0 || fixedBooks > 0 || limited > 0) {
             String message = String.format("Illegal Blocks: %s - %s Books: %s - Wrong Enchants: %s Limited: %s", fixedIllegals, Config.DROP_BOOKS ? "Dropped" : "Deleted", fixedBooks, wasFixed, limited);
             log("checkInventory", message);
-        }
+            return true;
+        } else return false;
     }
 
     /**
@@ -280,16 +281,18 @@ public class AnarchyAntiIllegals extends JavaPlugin {
 
                         Inventory inventoryShulker = shulker.getInventory();
 
-                        checkInventory(inventoryShulker, location, true, true);
+                        boolean wasChanged = checkInventory(inventoryShulker, location, true, true);
 
-                        shulker.getInventory().setContents(inventoryShulker.getContents());
-                        blockMeta.setBlockState(shulker);
+                        if (wasChanged) {
+                            shulker.getInventory().setContents(inventoryShulker.getContents());
+                            blockMeta.setBlockState(shulker);
 
-                        // JsonParseException
-                        try {
-                            itemStack.setItemMeta(blockMeta);
-                        } catch (Exception e) {
-                            log("checkItem", "Exception " + e.getMessage());
+                            // JsonParseException
+                            try {
+                                itemStack.setItemMeta(blockMeta);
+                            } catch (Exception e) {
+                                log("checkItem", "Exception " + e.getMessage());
+                            }
                         }
                     }
                 }
