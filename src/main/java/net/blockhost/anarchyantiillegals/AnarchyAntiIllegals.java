@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class AnarchyAntiIllegals extends JavaPlugin {
     private static final int MAX_LORE_ENCHANTMENT_LEVEL = 1;
@@ -144,6 +145,7 @@ public class AnarchyAntiIllegals extends JavaPlugin {
      */
     public ItemState checkItemStack(ItemStack itemStack, Location location, boolean checkRecursive) {
         boolean wasFixed = false;
+        AtomicReference<ItemMeta> metaRef = new AtomicReference<>();
 
         // null Item
         if (itemStack == null) return ItemState.EMPTY;
@@ -152,9 +154,29 @@ public class AnarchyAntiIllegals extends JavaPlugin {
             // Name Color Check
             if (itemStack.getType() != XMaterial.WRITTEN_BOOK.parseMaterial()) {
                 if (itemStack.hasItemMeta()) {
-                    ItemMeta itemMeta = itemStack.getItemMeta();
-                    itemMeta.setDisplayName(ChatColor.stripColor(itemMeta.getDisplayName()));
+                    ItemMeta itemMeta = getMeta(metaRef, itemStack);
+                    if (itemMeta.hasDisplayName()) {
+                        String name = itemMeta.getDisplayName();
+                        String stripped = ChatColor.stripColor(name);
+                        if (!name.equals(stripped)) {
+                            itemMeta.setDisplayName(stripped);
+                            itemStack.setItemMeta(itemMeta);
+                            wasFixed = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (Config.FORCE_ASCII_DISPLAY_NAME) {
+            if (itemStack.hasItemMeta() && getMeta(metaRef, itemStack).hasDisplayName()) {
+                ItemMeta itemMeta = getMeta(metaRef, itemStack);
+                String displayName = itemMeta.getDisplayName();
+
+                if (displayName.matches("[^\\p{ASCII}]")) {
+                    itemMeta.setDisplayName(displayName.replaceAll("[^\\p{ASCII}]", ""));
                     itemStack.setItemMeta(itemMeta);
+                    wasFixed = true;
                 }
             }
         }
@@ -162,9 +184,11 @@ public class AnarchyAntiIllegals extends JavaPlugin {
         if (Config.FIX_UNBREAKABLE) {
             // Unbreakables
             if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
-                if (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || itemStack.getItemMeta().isUnbreakable()) {
+                if (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || getMeta(metaRef, itemStack).isUnbreakable()) {
                     itemStack.setDurability((short) 0);
-                    itemStack.getItemMeta().setUnbreakable(false);
+                    ItemMeta itemMeta = getMeta(metaRef, itemStack);
+                    itemMeta.setUnbreakable(false);
+                    itemStack.setItemMeta(itemMeta);
                     itemStack.setAmount(0);
                 }
             }
@@ -195,30 +219,11 @@ public class AnarchyAntiIllegals extends JavaPlugin {
             }
         }
 
-        if (Config.FORCE_ASCII_DISPLAY_NAME) {
-            if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName()) {
-                ItemMeta itemMeta = itemStack.getItemMeta();
-                String displayName = itemMeta.getDisplayName();
-
-                if (displayName.matches("[^\\p{ASCII}]")) {
-                    itemMeta.setDisplayName(displayName.replaceAll("[^\\p{ASCII}]", ""));
-                    itemStack.setItemMeta(itemMeta);
-                }
-            }
-        }
-
         if (Config.REMOVE_LORE) {
             // Check items with lore
-            if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore()) {
-                // Christmas Illegals
-            /*if (itemStack.getItemMeta().getLore().contains("Christmas Advent Calendar 2020"))
-                return ItemState.clean;*/
-
-                // Thunderclouds Item
-                if (itemStack.getItemMeta().getLore().contains("ThunderCloud's Happy Little Friend. :)")) {
-                    itemStack.setAmount(0);
-                    return ItemState.ILLEGAL;
-                }
+            if (itemStack.hasItemMeta() && getMeta(metaRef, itemStack).hasLore()) {
+                itemStack.setAmount(0);
+                return ItemState.ILLEGAL;
             }
         }
 
@@ -273,8 +278,8 @@ public class AnarchyAntiIllegals extends JavaPlugin {
         if (Config.CHECK_SHULKERS) {
             // ShulkerBox Check
             if (itemStack.getType().toString().contains("SHULKER_BOX")) {
-                if (checkRecursive && itemStack.getItemMeta() instanceof BlockStateMeta) {
-                    BlockStateMeta blockMeta = (BlockStateMeta) itemStack.getItemMeta();
+                if (checkRecursive && getMeta(metaRef, itemStack) instanceof BlockStateMeta) {
+                    BlockStateMeta blockMeta = (BlockStateMeta) getMeta(metaRef, itemStack);
 
                     if (blockMeta.getBlockState() instanceof ShulkerBox) {
                         ShulkerBox shulker = (ShulkerBox) blockMeta.getBlockState();
@@ -312,6 +317,15 @@ public class AnarchyAntiIllegals extends JavaPlugin {
         }
 
         return wasFixed ? ItemState.WAS_FIXED : ItemState.CLEAN;
+    }
+
+    private ItemMeta getMeta(AtomicReference<ItemMeta> reference, ItemStack dataSource) {
+        ItemMeta referenceResolved = reference.get();
+        if (referenceResolved == null) {
+            ItemMeta createdMeta = dataSource.getItemMeta();
+            reference.set(createdMeta);
+            return createdMeta;
+        } else return referenceResolved;
     }
 
     public void log(String module, String message) {
