@@ -1,5 +1,7 @@
 package net.blockhost.anarchyantiillegals;
 
+import net.blockhost.anarchyantiillegals.compatibility.CompatibilityManager;
+import net.blockhost.anarchyantiillegals.compatibility.PluginHook;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
@@ -218,6 +220,10 @@ public class Events implements Listener {
 
         if (!(event.getWhoClicked() instanceof Player)) return;
 
+        for (PluginHook hook : CompatibilityManager.getHooks()) {
+            if (!hook.checkInventory(event.getWhoClicked(), event.getInventory())) return;
+        }
+
         if (plugin.checkItemStack(event.getCurrentItem(), event.getWhoClicked().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL)
             event.setCancelled(true);
 
@@ -232,11 +238,15 @@ public class Events implements Listener {
         if (Config.INVENTORY_OPEN_IGNORE_ENDER_CHEST
                 && event.getInventory().equals(event.getPlayer().getEnderChest())) return;
 
+        for (PluginHook hook : CompatibilityManager.getHooks()) {
+            if (!hook.checkInventory(event.getPlayer(), event.getInventory())) return;
+        }
+
         plugin.checkInventory(event.getInventory(), event.getPlayer().getLocation(), true);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onInventoryOpen(PlayerJoinEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         if (!Config.EVENT_PLAYER_JOIN) return;
 
         plugin.checkInventory(event.getPlayer().getInventory(), event.getPlayer().getLocation(), true);

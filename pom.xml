@@ -80,5 +80,19 @@
             <artifactId>XSeries</artifactId>
             <version>8.6.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.extendedclip</groupId>
+            <artifactId>deluxemenus</artifactId>
+            <version>LATEST</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/DeluxeMenus.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>me.linoxgh</groupId>
+            <artifactId>playerprofiles</artifactId>
+            <version>LATEST</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/PlayerProfiles.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>
