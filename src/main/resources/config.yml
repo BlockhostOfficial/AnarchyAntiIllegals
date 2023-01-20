@@ -83,3 +83,6 @@ weaponMaterials:
   - GOLD_SWORD
   - DIAMOND_SWORD
   - BOW
+
+# Only log illegal items to console. Does not remove them.
+onlyLog: false

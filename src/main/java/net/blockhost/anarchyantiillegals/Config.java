@@ -35,6 +35,7 @@ public class Config {
     public static boolean EVENT_INVENTORY_OPEN;
     public static boolean EVENT_PLAYER_JOIN;
     public static boolean EVENT_BLOCK_DISPENSE;
+    public static boolean ONLY_LOG;
 
     public static void load(FileConfiguration config) {
         REMOVE_ILLEGALS = config.getBoolean("removeIllegals");
@@ -70,5 +71,7 @@ public class Config {
         EVENT_INVENTORY_OPEN = config.getBoolean("eventInventoryOpen");
         EVENT_PLAYER_JOIN = config.getBoolean("eventPlayerJoin");
         EVENT_BLOCK_DISPENSE = config.getBoolean("eventBlockDispense");
+
+        ONLY_LOG = config.getBoolean("onlyLog");
     }
 }

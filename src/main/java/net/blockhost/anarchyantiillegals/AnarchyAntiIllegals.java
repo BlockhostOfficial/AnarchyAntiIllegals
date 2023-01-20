@@ -65,9 +65,7 @@ public class AnarchyAntiIllegals extends JavaPlugin {
 
                 case LIMITED_IN_SHULKERS:
                     if (isInsideShulker) {
-                        limitBlocksInShulker.putIfAbsent(itemStack.getType(), new ArrayList<>());
-
-                        limitBlocksInShulker.get(itemStack.getType()).add(index);
+                        limitBlocksInShulker.computeIfAbsent(itemStack.getType(), k -> new ArrayList<>()).add(index);
                     }
                     break;
 
@@ -80,7 +78,9 @@ public class AnarchyAntiIllegals extends JavaPlugin {
         if (Config.REMOVE_ILLEGALS) {
             // Remove illegal items
             for (ItemStack itemStack : removeItemStacks) {
-                itemStack.setAmount(0);
+                if (!Config.ONLY_LOG) {
+                    itemStack.setAmount(0);
+                }
                 fixedIllegals++;
             }
         }
@@ -89,10 +89,13 @@ public class AnarchyAntiIllegals extends JavaPlugin {
             // Remove books
             if (bookItemStacks.size() > Config.MAX_BOOKS) {
                 for (ItemStack itemStack : bookItemStacks) {
-                    itemStack.setAmount(0);
+                    if (!Config.ONLY_LOG) {
+                        itemStack.setAmount(0);
+                    }
+
                     fixedBooks++;
 
-                    if (Config.DROP_BOOKS) {
+                    if (!Config.ONLY_LOG && Config.DROP_BOOKS) {
                         if (location != null) {
                             new BukkitRunnable() {
                                 @Override
@@ -120,7 +123,10 @@ public class AnarchyAntiIllegals extends JavaPlugin {
                 for (Integer stack : entry.getValue()) {
                     current++;
                     if (current > max) {
-                        inventory.clear(stack);
+                        if (!Config.ONLY_LOG) {
+                            inventory.clear(stack);
+                        }
+
                         limited++;
                     }
                 }
@@ -159,8 +165,10 @@ public class AnarchyAntiIllegals extends JavaPlugin {
                         String name = itemMeta.getDisplayName();
                         String stripped = ChatColor.stripColor(name);
                         if (!name.equals(stripped)) {
-                            itemMeta.setDisplayName(stripped);
-                            itemStack.setItemMeta(itemMeta);
+                            if (!Config.ONLY_LOG) {
+                                itemMeta.setDisplayName(stripped);
+                                itemStack.setItemMeta(itemMeta);
+                            }
                             wasFixed = true;
                         }
                     }
@@ -174,8 +182,10 @@ public class AnarchyAntiIllegals extends JavaPlugin {
                 String displayName = itemMeta.getDisplayName();
 
                 if (displayName.matches("[^\\p{ASCII}]")) {
-                    itemMeta.setDisplayName(displayName.replaceAll("[^\\p{ASCII}]", ""));
-                    itemStack.setItemMeta(itemMeta);
+                    if (!Config.ONLY_LOG) {
+                        itemMeta.setDisplayName(displayName.replaceAll("[^\\p{ASCII}]", ""));
+                        itemStack.setItemMeta(itemMeta);
+                    }
                     wasFixed = true;
                 }
             }
@@ -185,11 +195,13 @@ public class AnarchyAntiIllegals extends JavaPlugin {
             // Unbreakables
             if (itemStack.getType().isItem() && !itemStack.getType().isEdible() && !itemStack.getType().isBlock()) {
                 if (itemStack.getDurability() > itemStack.getType().getMaxDurability() || itemStack.getDurability() < 0 || getMeta(metaRef, itemStack).isUnbreakable()) {
-                    itemStack.setDurability((short) 0);
                     ItemMeta itemMeta = getMeta(metaRef, itemStack);
-                    itemMeta.setUnbreakable(false);
-                    itemStack.setItemMeta(itemMeta);
-                    itemStack.setAmount(0);
+                    if (!Config.ONLY_LOG) {
+                        itemStack.setDurability((short) 0);
+                        itemMeta.setUnbreakable(false);
+                        itemStack.setItemMeta(itemMeta);
+                        itemStack.setAmount(0);
+                    }
                 }
             }
         }
@@ -197,7 +209,10 @@ public class AnarchyAntiIllegals extends JavaPlugin {
         if (Config.REMOVE_ILLEGALS) {
             // Illegal Blocks
             if (Checks.isIllegalBlock(itemStack.getType())) {
-                itemStack.setAmount(0);
+                if (!Config.ONLY_LOG) {
+                    itemStack.setAmount(0);
+                }
+
                 return ItemState.ILLEGAL;
             }
         }
@@ -206,7 +221,9 @@ public class AnarchyAntiIllegals extends JavaPlugin {
             // nbt furnace check
             if (itemStack.getType() == XMaterial.FURNACE.parseMaterial() && itemStack.toString().contains("internal=")) {
                 // TODO: replace this hack with a solution that checks the nbt tag
-                itemStack.setAmount(0);
+                if (!Config.ONLY_LOG) {
+                    itemStack.setAmount(0);
+                }
                 return ItemState.ILLEGAL;
             }
         }
@@ -214,7 +231,10 @@ public class AnarchyAntiIllegals extends JavaPlugin {
         if (Config.REMOVE_OVER_STACKED) {
             // Revert Overstacked Items
             if (itemStack.getAmount() > itemStack.getMaxStackSize()) {
-                itemStack.setAmount(itemStack.getMaxStackSize());
+                if (!Config.ONLY_LOG) {
+                    itemStack.setAmount(itemStack.getMaxStackSize());
+                }
+
                 wasFixed = true;
             }
         }
@@ -222,7 +242,10 @@ public class AnarchyAntiIllegals extends JavaPlugin {
         if (Config.REMOVE_LORE) {
             // Check items with lore
             if (itemStack.hasItemMeta() && getMeta(metaRef, itemStack).hasLore()) {
-                itemStack.setAmount(0);
+                if (!Config.ONLY_LOG) {
+                    itemStack.setAmount(0);
+                }
+
                 return ItemState.ILLEGAL;
             }
         }
@@ -241,7 +264,10 @@ public class AnarchyAntiIllegals extends JavaPlugin {
                         Enchantment e1 = keys.get(kI1);
 
                         if (e1.conflictsWith(keys.get(kI2))) {
-                            itemStack.removeEnchantment(e1);
+                            if (!Config.ONLY_LOG) {
+                                itemStack.removeEnchantment(e1);
+                            }
+
                             //log("checkItem", "Removing conflicting enchantment " + e1.getName() + " from " + itemStack.getType());
                             keys.remove(e1);
                             if (kI1 > 0) {
@@ -263,14 +289,18 @@ public class AnarchyAntiIllegals extends JavaPlugin {
                     // enforce lore enchantments level
                     wasFixed = true;
 
-                    itemStack.removeEnchantment(enchantment);
-                    itemStack.addUnsafeEnchantment(enchantment, MAX_LORE_ENCHANTMENT_LEVEL);
+                    if (!Config.ONLY_LOG) {
+                        itemStack.removeEnchantment(enchantment);
+                        itemStack.addUnsafeEnchantment(enchantment, MAX_LORE_ENCHANTMENT_LEVEL);
+                    }
                 } else if (itemStack.getEnchantmentLevel(enchantment) > enchantment.getMaxLevel()) {
                     // enforce max enchantment level
                     wasFixed = true;
 
-                    itemStack.removeEnchantment(enchantment);
-                    itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
+                    if (!Config.ONLY_LOG) {
+                        itemStack.removeEnchantment(enchantment);
+                        itemStack.addEnchantment(enchantment, enchantment.getMaxLevel());
+                    }
                 }
             }
         }
@@ -288,7 +318,7 @@ public class AnarchyAntiIllegals extends JavaPlugin {
 
                         boolean wasChanged = checkInventory(inventoryShulker, location, true, true);
 
-                        if (wasChanged) {
+                        if (wasChanged && !Config.ONLY_LOG) {
                             shulker.getInventory().setContents(inventoryShulker.getContents());
                             blockMeta.setBlockState(shulker);
 

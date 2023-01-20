@@ -1,5 +1,6 @@
 package net.blockhost.anarchyantiillegals;
 
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
@@ -24,12 +25,9 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+@RequiredArgsConstructor
 public class Events implements Listener {
     private final AnarchyAntiIllegals plugin;
-
-    public Events(AnarchyAntiIllegals plugin) {
-        this.plugin = plugin;
-    }
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
@@ -52,7 +50,7 @@ public class Events implements Listener {
             // placed block - stop placing if it's an illegal
             if (Checks.isIllegalBlock(event.getBlockPlaced().getType())
                     && event.getBlockPlaced().getType() != event.getBlockReplacedState().getType()) {
-                event.setCancelled(true);
+                cancelEvent(() -> event.setCancelled(true));
                 plugin.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing " + event.getBlockPlaced());
             }
         }
@@ -96,7 +94,7 @@ public class Events implements Listener {
         Player player = (Player) event.getEntity();
 
         if (plugin.checkItemStack(event.getItem().getItemStack(), player.getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
-            event.setCancelled(true);
+            cancelEvent(() -> event.setCancelled(true));
             plugin.log(event.getEventName(), "Stopped " + event.getEntity().getName() + " from picking up an illegal item");
         }
     }
@@ -118,11 +116,11 @@ public class Events implements Listener {
 
         if (event.getMainHandItem() != null
                 && plugin.checkItemStack(event.getMainHandItem(), event.getPlayer().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-            event.setCancelled(true);
+            cancelEvent(() -> event.setCancelled(true));
 
         if (event.getOffHandItem() != null
                 && plugin.checkItemStack(event.getOffHandItem(), event.getPlayer().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-            event.setCancelled(true);
+            cancelEvent(() -> event.setCancelled(true));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -134,11 +132,11 @@ public class Events implements Listener {
 
         if (event.getPlayer().getInventory().getItem(event.getNewSlot()) != null)
             if (plugin.checkItemStack(event.getPlayer().getInventory().getItem(event.getNewSlot()), event.getPlayer().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-                event.setCancelled(true);
+                cancelEvent(() -> event.setCancelled(true));
 
         if (event.getPlayer().getInventory().getItem(event.getPreviousSlot()) != null)
             if (plugin.checkItemStack(event.getPlayer().getInventory().getItem(event.getPreviousSlot()), event.getPlayer().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-                event.setCancelled(true);
+                cancelEvent(() -> event.setCancelled(true));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -147,8 +145,9 @@ public class Events implements Listener {
 
         if (event.getItem() == null) return;
 
-        if (plugin.checkItemStack(event.getItem(), event.getSource().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-            event.setCancelled(true);
+        if (plugin.checkItemStack(event.getItem(), event.getSource().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
+            cancelEvent(() -> event.setCancelled(true));
+        }
     }
 
     @SuppressWarnings("IsCancelled")
@@ -164,19 +163,23 @@ public class Events implements Listener {
         Location loc = event.getPlayer().getLocation();
         PlayerInventory inv = event.getPlayer().getInventory();
 
-        if (plugin.checkItemStack(inv.getItemInMainHand(), loc, false) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-            event.setCancelled(true);
+        if (plugin.checkItemStack(inv.getItemInMainHand(), loc, false) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
+            cancelEvent(() -> event.setCancelled(true));
+        }
 
-        if (plugin.checkItemStack(inv.getItemInOffHand(), loc, false) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-            event.setCancelled(true);
+        if (plugin.checkItemStack(inv.getItemInOffHand(), loc, false) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
+            cancelEvent(() -> event.setCancelled(true));
+        }
 
         ItemStack frameStack = ((ItemFrame) event.getRightClicked()).getItem();
 
-        if (plugin.checkItemStack(frameStack, loc, false) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-            event.setCancelled(true);
+        if (plugin.checkItemStack(frameStack, loc, false) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
+            cancelEvent(() -> event.setCancelled(true));
+        }
 
-        if (event.isCancelled())
+        if (event.isCancelled()) {
             plugin.log(event.getEventName(), "Stopped " + event.getPlayer().getName() + " from placing an illegal item in an item frame");
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -189,8 +192,10 @@ public class Events implements Listener {
         ItemStack item = ((ItemFrame) event.getEntity()).getItem();
 
         if (plugin.checkItemStack(item, event.getEntity().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
-            event.setCancelled(true);
-            ((ItemFrame) event.getEntity()).setItem(new ItemStack(Material.AIR));
+            cancelEvent(() -> {
+                event.setCancelled(true);
+                ((ItemFrame) event.getEntity()).setItem(new ItemStack(Material.AIR));
+            });
             plugin.log(event.getEventName(), "Deleted Illegal from " + event.getEntity().getName());
         }
     }
@@ -205,7 +210,7 @@ public class Events implements Listener {
         ItemFrame itemFrame = (ItemFrame) event.getEntity();
 
         if (plugin.checkItemStack(itemFrame.getItem(), event.getEntity().getLocation(), false) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
-            itemFrame.setItem(new ItemStack(Material.AIR));
+            cancelEvent(() -> itemFrame.setItem(new ItemStack(Material.AIR)));
             plugin.log(event.getEventName(), "Removed illegal item from " + itemFrame);
         }
     }
@@ -218,11 +223,11 @@ public class Events implements Listener {
 
         if (!(event.getWhoClicked() instanceof Player)) return;
 
-        if (plugin.checkItemStack(event.getCurrentItem(), event.getWhoClicked().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-            event.setCancelled(true);
-
-        if (plugin.checkItemStack(event.getCursor(), event.getWhoClicked().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL)
-            event.setCancelled(true);
+        if (plugin.checkItemStack(event.getCurrentItem(), event.getWhoClicked().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
+            cancelEvent(() -> event.setCancelled(true));
+        } else if (plugin.checkItemStack(event.getCursor(), event.getWhoClicked().getLocation(), true) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
+            cancelEvent(() -> event.setCancelled(true));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -250,10 +255,24 @@ public class Events implements Listener {
         if (!Config.EVENT_BLOCK_DISPENSE) return;
 
         if (plugin.checkItemStack(event.getItem(), event.getBlock().getLocation(), false) == AnarchyAntiIllegals.ItemState.ILLEGAL) {
-            event.setCancelled(true);
-            event.setItem(new ItemStack(Material.AIR));
-            event.getBlock().getState().update(true, false);
+            cancelEvent(() -> {
+                event.setCancelled(true);
+                event.setItem(new ItemStack(Material.AIR));
+                event.getBlock().getState().update(true, false);
+            });
             plugin.log(event.getEventName(), "Stopped dispensing of an illegal block.");
         }
+    }
+
+    private void cancelEvent(CancellableEvent event) {
+        if (Config.ONLY_LOG) {
+            return;
+        }
+
+        event.cancel();
+    }
+
+    interface CancellableEvent {
+        void cancel();
     }
 }
